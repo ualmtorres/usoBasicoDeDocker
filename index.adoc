@@ -15,9 +15,9 @@ Codificación, idioma, tabla de contenidos, tipo de documento
 Nombre y título del trabajo
 ////
 # Desarrollo de aplicaciones con Docker
-Servicio de las Tecnologías de la Información y las Comunicaciones - Universidad de Almería
+Manuel Torres - Departamento de Informática - Universidad de Almería
 
-image::logocloudstic.png[]
+image::di.png[]
 
 // NO CAMBIAR!! (Entrar en modo no numerado de apartados)
 :numbered!: 
@@ -30,7 +30,7 @@ COLOCA A CONTINUACION EL RESUMEN
 ////
 Docker es un proyecto open source creado en 2013 y que ha supuesto una revolución para el desarrollo y despliegue de operaciones. Docker abstrae el hardware y el sistema operativo del host ejecutando las aplicaciones en contenedores, compartimentos aislados que contienen todos los recursos para una aplicación o servicio.
 
-En este seminario veremos cómo usar Docker para el desarrollo de aplicaciones sencillas, aprendiendo a crear servicios con _Docker Compose_ y concer la técnica de desarrollo de aplicaciones multicontenedor con _Docker Compose_
+En este seminario veremos cómo usar Docker para el desarrollo de aplicaciones sencillas, aprendiendo a crear servicios con _Docker Compose_ y conocer la técnica de desarrollo de aplicaciones multicontenedor con _Docker Compose_
 
 
 ////
@@ -77,7 +77,7 @@ Basta con ejecutar los tres comandos siguientes en una máquina con Docker insta
 ----
 $ git clone https://github.com/ualmtorres/docker_customer_catalog.git
 $ cd docker_customer_catalog
-$ docker-compose up -d
+$ docker compose up -d
 ----
 
 .Aplicación sencilla que muestra un listado de clientes de una base de datos
@@ -86,7 +86,7 @@ image::./CustomerCatalog.png[]
 Para detener el ejemplo anterior, desde la carpeta donde se ha desplegado la aplicación ejecutaremos
 
 ```bash
-$ docker-compose down
+$ docker compose down
 ```
 
 Esto eliminará todo lo que se ha creado para este ejemplo (contenedores y red de interconexión de dichos contenedores).
@@ -135,17 +135,12 @@ https://docs.docker.com/install/#desktop[https://docs.docker.com/install/#deskto
 Obtenemos: 
 
 - Daemon de docker
-- Cliente de docker
+- Cliente de docker, que es el que ejecutamos en la consola
 - Docker compose
 
-.Configuración de Shared Drices en Docker for Windows
-****
-A la hora de configurar volúmenes para poder ofrecer persistencia a los contenedodres, los discos locales han de ser accesibles desde los contenedores creados. En versiones anteriores de Docker Desktop para Windows hay que que configurar `Docker Desktop` desde la barra de menús.
+Tras esto, Docker Desktop se ejecutará en segundo plano y estará disponible para ejecutar comandos de Docker. Nos da una interfaz gráfica para ver los contenedores que tenemos en ejecución, las imágenes que tenemos, volúmenes para almacenamiento persistente, redes de interconexión entre contenedores, etc. Desde Docker Desktop y la consola podemos crear y eliminar contenedores, imágenes, volúmenes y redes. Desde la barra de herramientas de Docker podemos acceder a la configuración, al Learning Center y al entorno Docker de nuestro ordenador.
 
-Seleccionar `Settings | Shared Drives` y seleccionar las unidades que pueden ser usadas por los contenedores.
-
-image::SharedDrives.png[]
-****
+image:docker-desktop.png[]
 
 #### Crear cuenta en Docker Hub
 
@@ -164,15 +159,17 @@ image::./DockerEngine.png[]
 
 ### El Hola mundo
 
+Desde una terminal, ejecutamos los siguientes comandos para comprobar que Docker está instalado y funcionando correctamente.
+
 ```bash
 $ docker --version
-Docker version 18.09.2, build 6247962
+Docker version 27.4.0, build bde2b89
 
 $ docker run hello-world
-Unable to find image 'hello-world:latest' locally 
+Unable to find image 'hello-world:latest' locally
 latest: Pulling from library/hello-world
-9bb5a5d4561a: Pull complete 
-Digest: sha256:f5233545e43561214ca4891fd1157e1c3c563316ed8e237750d59bde73361e77
+c9c5fd25a1bd: Pull complete 
+Digest: sha256:c41088499908a59aae84b0a49c70e86f4731e588a737f1637e73c8c09d995654
 Status: Downloaded newer image for hello-world:latest
 
 Hello from Docker!
@@ -230,7 +227,7 @@ image::./FuncionamientoBasico.png[width=100%]
 
 ### Imágenes interesantes de Docker
 
-En https://hub.docker.com/explore/[https://hub.docker.com/explore/, window="_blank"] se encuentran las imágenes ordenadas por popularidad. Destacamos:
+En la página inicial de Docker[https://hub.docker.com/, window="_blank"] se muestran distintas imágenes agrupadas por categorías. Destacamos:
 
 * alpine: Linux reducido
 * nginx: Servidor web Nginx
@@ -428,7 +425,7 @@ $ docker rm -f `docker ps -a | grep "wordpress" | awk '{print $1}'`: Eliminar to
 
 [TIP]
 ====
-Hay muchas _Cheat Sheets_ con resumen de los comandos principales de Docker. http://dockerlabs.collabnix.com/docker/cheatsheet/[Aquí] puedes encontrar una que está bastante bien.
+Hay muchas _Cheat Sheets_ con resumen de los comandos principales de Docker. http://dockerlabs.collabnix.com/docker/cheatsheet/[Aquí, window="_blank"] puedes encontrar una que está bastante bien.
 ====
 
 ## _Bind mounts_
@@ -614,8 +611,8 @@ Fragmento de `Dockerfile` para construir una imagen con Ubuntu como base y defin
 
 ```
 FROM ubuntu:latest
-RUN apt-get update -y
-RUN apt-get install -y python-pip python-dev
+RUN apt update -y
+RUN apt install -y python-pip python-dev
 WORKDIR /app
 ENV DEBUG=True
 EXPOSE 80
@@ -639,7 +636,7 @@ Una https://hub.docker.com/r/library/alpine/tags/[imagen comprimida de Alpine] e
 
 ### Distribución y ejecución de aplicaciones mediante `Dockerfile`
 
-Supongamos el siguiente escenario. Contamos con el código de una aplicación disponible en un repositorio. Con la ayuda de `Dockerfile` podemos crear una imagen local con todo el software y configuración que necesita la aplicación para ejecutarse y crear después un contenedor a partir de dicha imagen. El código de la aplicación podrá ser copiado directamete al contenedor o se podrá montar un volumen en el sistema de archivos del host de forma que se pueda editar el código y no se pierdan los cambios al eliminar el contenedor.
+Supongamos el siguiente escenario. Contamos con el código de una aplicación disponible en un repositorio. Con la ayuda de `Dockerfile` podemos crear una imagen local con todo el software y configuración que necesita la aplicación para ejecutarse y crear después un contenedor a partir de dicha imagen. El código de la aplicación podrá ser copiado directamente al contenedor o se podrá montar un volumen en el sistema de archivos del host de forma que se pueda editar el código y no se pierdan los cambios al eliminar el contenedor.
 
 Por tanto, una buena forma de distribuir una aplicación puede ser incluir un `Dockerfile` con la configuración de software que necesita para ejecutarse junto con el código de la aplicación.
 
@@ -651,18 +648,18 @@ El `Dockerfile` siguiente contiene los pasos a seguir para:
 * Crear un punto de montaje en el contenedor. Este punto de montaje se podrá conectar al sistema de archivos del host con un _bind mount_ al iniciar el contenedor.
 
 ```
-FROM ualmtorres/phalcon-apache-ubuntu <1>
+FROM httpd <1>
 
-ADD webEstaticaBasica /var/www/html <2>
+ADD webEstaticaBasica /usr/local/apache2/htdocs <2>
 
 EXPOSE 80 <3>
 
-VOLUME /var/www/html <4>
+VOLUME /usr/local/apache2/htdocs <4>
 ```
-<1> Imagen de base. Incluye Apache, PHP y el framework Phalcon
-<2> Añade el código de la carpeta `webEstaticaBasica` del sistema de archivos local a la carpeta `/var/www/html` del contenedor
+<1> Imagen de base del servidor Apache
+<2> Añade el código de la carpeta `webEstaticaBasica` del sistema de archivos local a la carpeta `/usr/local/apache2/htdocs` del contenedor
 <3> Informa del puerto en el que escucha el contenedor
-<4> Ofrece la carpeta `/var/www/html` como punto de montaje
+<4> Ofrece la carpeta `/usr/local/apache2/htdocs` como punto de montaje
 
 
 [NOTE]
@@ -685,8 +682,8 @@ EXPOSE 80 443
 Configura tus propias imagen de base siguiendo el ejemplo del anexo <<Configuración de imágenes de base>>
 ====
 
-En un caso sencillo, podríamos reducir a que una aplicación está formada su base de código y el entorno en el que se ejecuta. El código de esa aplicación posiblemente esté en un repositorio 
-Vamos a construir un contenedor a partir del código del repositorio y lo ofrezca al host como un volumen. El proceso a seguir es:
+En un caso sencillo, podríamos reducir a que una aplicación está formada por su base de código y el entorno en el que se ejecuta. El código de esa aplicación posiblemente esté en un repositorio. 
+Vamos a construir un contenedor a partir del código del repositorio y que lo ofrezca al host como un volumen. El proceso a seguir es:
 
 1. Descargar el repositorio del código de la aplicación.
 
@@ -699,13 +696,13 @@ $ git clone https://github.com/ualmtorres/webEstaticaBasica.git
 
 +
 ```
-FROM ualmtorres/phalcon-apache-ubuntu
+FROM httpd
 
-ADD index.html /var/www/html
+ADD index.html /usr/local/apache2/htdocs
 
 EXPOSE 80
 
-VOLUME /var/www/html
+VOLUME /usr/local/apache2/htdocs
 ```
 
 +
@@ -721,7 +718,7 @@ Es buena idea incluir en el repositorio de la aplicación el `Dockerfile`. Así 
 
 El comando `docker build` crea una imagen nueva usando las instrucciones del `Dockerfile`.
 
-`$ docker build -t ualmtorres/web-estatica-basica:v0 .`
+`$ docker build -t ualmtorres/web-estatica-basica:v0.1 .`
 
 * Con `-t` definimos una etiqueta o nombre de la imagen. Al construir la imagen pasa a nuestro registro local.
 * Con `.` indicamos a Docker que utilice el directorio actual como contexto para hace el _build_
@@ -736,7 +733,7 @@ Es buena práctica crear etiquetas con el nombre de usuario el Docker Hub, el no
 ```bash
 $ docker image list
 REPOSITORY                                   TAG                 IMAGE ID            CREATED             SIZE
-ualmtorres/web-estatica-basica               v0                  ed27de86aa03        30 seconds ago      309MB
+ualmtorres/web-estatica-basica            v0.1                           8a1fd86fd203   24 seconds ago   178MB
 ```
 
 ### Ejecución de la aplicación a partir de la imagen creada
@@ -748,7 +745,7 @@ $ docker run -d \
     -p 83:80 \
     --name webEstaticaBasica \
     -v $(pwd):/var/www/html \
-    ualmtorres/web-estatica-basica:v0
+    ualmtorres/web-estatica-basica:v0.1
 ```
 
 [NOTE]
@@ -761,7 +758,7 @@ docker run -d \
     -p 83:80 \
     --name webEstaticaBasica \
     -v /"$(pwd)":/var/www/html \
-    ualmtorres/web-estatica-basica:v0
+    ualmtorres/web-estatica-basica:v0.1
 ---
 ====
 
@@ -803,18 +800,18 @@ $ docker image rm <image>: Elimina una imagen local
 * Docker Compose es una herramienta para definir y ejecutar aplicaciones Docker con varios contenedores.
 * De forma predeterminada, usaremos un archivo `docker-compose.yml` para configurar los _servicios_ de la aplicación. Los servicios son los componentes de la aplicación (p.e. un servicio para el almacenamiento de los datos y otro para el front-end)
 * En un mismo host podemos tener varios entornos aislados. Compose usa nombres de proyecto para mantener a los entornos aislados. De forma predeterminada, Compose usa el nombre del directorio desde donde se lanza la aplicación.
-* `docker-compose --version` para obtener la versión y saber si está instalado.
+* `docker compose version` para obtener la versión y saber si está instalado.
 * Instalación desde https://docs.docker.com/compose/install[https://docs.docker.com/compose/install]
 
 ### Flujo de trabajo básico con Docker Compose
 
 1. Crear el archivo `docker-compose.yml` con los servicios de la aplicación (p.e. php y mysql)
-2. Construir y lanzar el entorno en modo _dettached_ con `docker-compose up -d`
-3. Echar abajo el entorno con `docker-compose down`
+2. Construir y lanzar el entorno en modo _dettached_ con `docker compose up -d`
+3. Echar abajo el entorno con `docker compose down`
 
 [IMPORTANT]
 ====
-El comando `docker-compose down` necesita el archivo `docker-compose.yml` para echar abajo el entorno. Por tanto, siempre tiene que ejecutarse en el directorio donde se lanzó `docker-compose up`. Sin embargo, en ocasiones cerraremos la ventana desde donde se lanzó el entorno y necesitamos alguna forma de poder recordar dónde estaba.
+El comando `docker compose down` necesita el archivo `docker-compose.yml` para echar abajo el entorno. Por tanto, siempre tiene que ejecutarse en el directorio donde se lanzó `docker compose up`. Sin embargo, en ocasiones cerraremos la ventana desde donde se lanzó el entorno y necesitamos alguna forma de poder recordar dónde estaba.
 
 El script siguiente devuelve los nombres de directorio desde los que se hayan lanzado todos los entornos de Compose que se tengan en ejecución.
 
@@ -832,9 +829,10 @@ A partir de ahí, se trata de buscar en el sistema de archivos del host los nomb
 ### Comandos básicos para Docker Compose
 
 ```sh
-$ docker-compose up -d      Construye y lanza el entorno en modo dettached
-$ docker-compose pull       Descarga las imágenes pero no inicia los contenedores
-$ docker-compose rm [-fs]   Borra los contedores parados. Con -fs los detiene y fuerza su borrado
+$ docker compose up -d      Construye y lanza el entorno en modo dettached
+$ docker compose pull       Descarga las imágenes pero no inicia los contenedores
+$ docker compose down [-v]     Para y elimina los contenedores, redes y volúmenes creados por `docker compose up`. Con -v también elimina los volúmenes
+$ docker compose rm [-fs]   Borra los contedores parados. Con -fs los detiene y fuerza su borrado
 ```
 
 ### Ejemplo: Aplicación web (PHP) con soporte de Base de datos (MySQL)
@@ -859,61 +857,78 @@ En ese repositorio se encuentra:
 `docker-compose.yml`
 
 ```yaml
-version: '2'
+version: "3.8"
+
 services:
-  mysql:
-    container_name: mysql <1>
-    restart: always
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: 'secret' # TODO: Change this
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./data:/var/lib/mysql <2>
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql <3>
   php:
-    container_name: php
-    restart: always
-    image: ualmtorres/phalcon-apache-ubuntu
+    container_name: php 
+    build:
+      dockerfile: ./docker/php/Dockerfile
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./html:/usr/share/nginx/html <1>
+    command: sh -c "cd /usr/share/nginx/html && php-fpm"
+
+  nginx:
+    container_name: nginx
+    image: nginx:stable-alpine
     ports:
       - "80:80"
     volumes:
-      - ./html:/var/www/html <4>
+      - ./html:/usr/share/nginx/html <2>
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+
+  mysql: <3>
+    container_name: mysql
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: example
+      MYSQL_PASSWORD: example
+      MYSQL_DATABASE: SG
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql <4>
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql <5>
+
+volumes:
+  mysql_data:
 ```
-<1> Nombre del contenedor. Este será el nombre que usará el contendor de la aplicación PHP para poder acceder a este contenedor
-<2> Montar una carpeta `data` de nuestro host en la ruta en la que el servicio `mysql` almacena la base de datos
-<3> La imagen de MySQL ejecutará al inicio cualquier script que encuentre en `/docker-entrypoint-initdb.d/`
-<4> Montar una carpeta `html` de nuestro host en la ruta en la que el servicio `php` almacena la aplicación
+<1> Montar una carpeta `html` de nuestro host en la ruta en la que el servicio `php` almacena la aplicación
+<2> Montar una carpeta `html` de nuestro host en la ruta en la que el servicio `nginx` almacena la aplicación
+<3> Nombre del contenedor. Este será el nombre que usará el contenedor de la aplicación PHP para poder acceder al contenedor de la base de datos
+<4> Montar un volumen externo para almacenar los datos de la base de datos. Este volumen se almacenará en el host y no se perderá al eliminar el contenedor
+<5> La imagen de MySQL ejecutará al inicio cualquier script que encuentre en `/docker-entrypoint-initdb.d/`
 
 Para lanzar la aplicación multicontenedor ejecutaremos el comando
 
 ```
 $ cd docker_customer_catalog
-$ docker-compose up -d
+$ docker compose up -d
 ```
 
 [NOTE]
 ====
-Este archivo despliega un contenedor denominado `mysql` en el puerto `3306` del host y otro contenedor denominado `php` en el puerto `80` del host. No podrá haber otros contenedores en el host, aunque estén parados` con esos nombres y esos puertos deberán estar libres.
+Este archivo despliega un contenedor denominado `mysql` en el puerto `3306` del host, un contenedor denominado `php` en el puerto `9000` del host y un contenedor denominado `nginx` en el puerto `80` del host. No podrá haber otros contenedores en el host, aunque estén parados` con esos nombres y esos puertos deberán estar libres.
 ====
 
 Esto creará un contenedor para cada servicio y una red para que los contenedores de los servicios se puedan comunicar entre sí. El nombre de la red vendrá determinado por el nombre del directorio desde donde se lance Docker Compose. Los contenedores podrán referenciarse unos a otros por el nombre del contenedor.
 
-Para probar esto, abrir una sesión interactiva en el contenedor PHP y hacer `ping mysql`
+Para probar esto, abrir una sesión interactiva en el contenedor PHP y hacer `getent hosts` para ver la tabla de nombres de host. En esta tabla se puede ver que el contenedor `php` puede referenciar al contenedor `mysql` por su nombre.
 
 [source, bash]
 ----
 $ docker exec -it php bash
 
-root@61d202a9f1bf:/app# ping mysql <1>
-
-PING mysql (192.168.32.3) 56(84) bytes of data.
-64 bytes from mysql.docker_customer_catalog_default (192.168.32.3): icmp_seq=1 ttl=64 time=0.132 ms
-64 bytes from mysql.docker_customer_catalog_default (192.168.32.3): icmp_seq=2 ttl=64 time=0.185 ms
-64 bytes from mysql.docker_customer_catalog_default (192.168.32.3): icmp_seq=3 ttl=64 time=0.120 ms
+root@42e5c7369382:/var/www/slim_app# getent hosts mysql <1>
+172.18.0.3      mysql
+root@42e5c7369382:/var/www/slim_app# 
 ----
-<1> Se usa el nombre del contenedor asignado en `docker-compose.yml` para referenciarlo
+<1> Se usa el nombre del contenedor asignado en `docker-compose.yml` para referenciarlo. La IP es la dirección IP del contenedor `mysql` en la red creada por Docker Compose
 
 [IMPORTANT]
 ====
@@ -954,10 +969,14 @@ Aunque en el `docker-compose.yml` es posible asignar un nombre diferente al cont
       </thead>
       <tbody>
         <?php
-        $conexion = new mysqli("mysql", "root", "secret", "SG"); <1>
+        $host = "mysql";
+        $username = "root";
+        $password = "secret";
+        $database = "SG";
+        $mysqli = new mysqli($host, $username, $password, $database); <1>
 
         $cadenaSQL = "select * from s_customer";
-        $resultado = $conexion->query($cadenaSQL);
+        $resultado = $mysqli->query($cadenaSQL);
 
         while ($fila = $resultado->fetch_object()) {
          echo "<tr><td> " .$fila->name . 
@@ -1122,7 +1141,7 @@ services:
 <3> Mapping de puertos para el front (El 80 está ocupado con la API)
 <4> Volumen en el host montado en el directorio `/var/www/html` del contenedor
 
-Si volvemos a desplegar el `docker-compose.yml` con `docker-compose up -d`, se mantiene intacto lo ya desplegado y se despliegan las modificaciones. El front se verá ejecutándose en el puerto 8088
+Si volvemos a desplegar el `docker-compose.yml` con `docker compose up -d`, se mantiene intacto lo ya desplegado y se despliegan las modificaciones. El front se verá ejecutándose en el puerto 8088
 
 image::calificaciones-front.png[]
 
@@ -1210,12 +1229,12 @@ Para comprobar el funcionamiento de este nuevo procedimiento, eliminaremos todo 
 
 [source,bash]
 ----
-$ docker-compose down
+$ docker compose down
 $ docker image rm ualmtorres/calificaciones-api:v0
 $ docker image rm ualmtorres/calificaciones-front:v0
 ----
 
-A continuación, basta con volver a levantar el entorno com `docker-compose up -d` y veremos como se construyen las imágenes para el despliegue de los contenedores y los servicios de Docker Compose funcionan correctamte.
+A continuación, basta con volver a levantar el entorno com `docker compose up -d` y veremos como se construyen las imágenes para el despliegue de los contenedores y los servicios de Docker Compose funcionan correctamte.
 
 image::calificaciones-front.png[]
 
@@ -1224,7 +1243,7 @@ Cuando introduzcamos cambios en la base de código y queramos volver a desplegar
 [source,bash]
 ----
 $ docker-compose build
-$ docker-compose up --build
+$ docker compose up --build
 ----
 
 
@@ -1233,13 +1252,13 @@ $ docker-compose up --build
 
 ### Configuración de imágenes de base
 
-Aquí se muestra cómo configurar una imagen con Ubuntu 18.04, PHP y el framework Phalcon. También se muestran los dos archivos auxiliares necesarios para la configuración de Apache que necesita Phalcon.
+Aquí se muestra cómo configurar una imagen con Ubuntu 20.04, PHP y el framework Phalcon. También se muestran los dos archivos auxiliares necesarios para la configuración de Apache que necesita Phalcon.
 
 .Dockerfile
 ====
 [source,dockerfile]
 ----
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -1386,30 +1405,73 @@ image::./DockerEcosystem.png[width=100%]
 
 ### Instalar un registro de imágenes propio
 
-Es posible tener un registro propio para imágenes por cuestiones de seguridad y confidencialidad. Veamos cómo crear un registro propio mediante contenedores (uno para el registro en sí y otro cono Web UI).
+Es posible tener un registro propio para imágenes por cuestiones de seguridad y confidencialidad. Veamos cómo crear un registro propio mediante contenedores. Se trata de un https://gist.github.com/ualmtorres/16d61858a92ea8cbd365f052052c4608[despliegue Docker Compose] que incluye un servicio para el registro (servidor) y otro para la interfaz web del registro. La interfaz web es opcional, pero es muy útil para ver las imágenes que tenemos en el registro y para subir imágenes al registro.
 
-El ejemplo será obtener una imagen Alpine de Docker Hub y subirla a nuestro propio registro
+[source, yaml]
+----
+version: "3.8"
+
+services:
+  registry-ui: <1>
+    image: joxit/docker-registry-ui:main
+    restart: always
+    ports:
+      - 80:80 <2>
+    environment:
+      - SINGLE_REGISTRY=true
+      - REGISTRY_TITLE=Docker Registry UI
+      - DELETE_IMAGES=true
+      - SHOW_CONTENT_DIGEST=true
+      - NGINX_PROXY_PASS_URL=http://registry-server:5000 <3>
+      - SHOW_CATALOG_NB_TAGS=true
+      - CATALOG_MIN_BRANCHES=1
+      - CATALOG_MAX_BRANCHES=1
+      - TAGLIST_PAGE_SIZE=100
+      - REGISTRY_SECURED=false
+      - CATALOG_ELEMENTS_LIMIT=1000
+    container_name: registry-ui
+
+  registry-server: <4>
+    image: registry:2.8.2
+    restart: always
+    environment:
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin: "[http://registry.example.com]"
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods: "[HEAD,GET,OPTIONS,DELETE]"
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Credentials: "[true]"
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers: "[Authorization,Accept,Cache-Control]"
+      REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers: "[Docker-Content-Digest]"
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    volumes:
+      - ./registry/data:/var/lib/registry <5>
+    container_name: registry-server
+----
+<1> Interfaz web para el registro
+<2> Puerto de la interfaz web
+<3> URL del registro
+<4> Registro de imágenes
+<5> Volumen para almacenar las imágenes del registro. Este volumen se almacenará en el host y no se perderá al eliminar el contenedor
+
+Para desplegar el registro de imágenes propio, basta con ejecutar el siguiente comando en el directorio donde se encuentra el archivo `docker-compose.yml`
+
+[source, bash]
+----
+$ docker compose up -d
+----
+
+Esto creará un contenedor para el registro de imágenes y otro para la interfaz web del registro. El nombre del contenedor del registro será `registry-server` y el de la interfaz web será `registry-ui`. La interfaz web estará disponible en el puerto 80 del host.
+
+
+El ejemplo será obtener la imagen `hello-world`` de Docker Hub y subirla a nuestro propio registro
 
 ```bash
-// En el servidor (p.e. 192.168.65.103)
-$ docker run -d -p 5000:5000 --restart always --name registry registry:2
-$ docker run \
-  -d \
-  -e ENV_DOCKER_REGISTRY_HOST=192.168.65.103 \
-  -e ENV_DOCKER_REGISTRY_PORT=5000 \
-  -p 8080:80 \
-  konradkleine/docker-registry-frontend:v2
-  
 // En nuestro equipo
-$ docker pull alpine <1>
-$ docker image list | grep alpine <2> 
-$ docker tag 3e640a41799a 192.168.65.103:5000/alpine <3>
-$ docker push 192.168.65.103:5000/alpine <4>
+$ docker pull hello-world <1>
+$ docker tag hello-world localhost/hello-world <2>
+$ docker push localhost/hello-world <3>
 ```
-<1> Descargar una imagen de prueba de Alpine al registro local
-<2> Obtener el identificador de la imagen Alpine descargada (p.e. `3e640a41799a`)
-<3> La imagen se etiqueta añadiéndole como prefijo host:puerto de nuestro registro
-<4> Subida de la imagen al registro
+<1> Descargar la imagen de prueba `hello-world`` al registro local
+<2> La imagen se etiqueta añadiéndole como prefijo el host de nuestro registro
+<3> Subida de la imagen al registro
 
 image::./RegistroPropio.png[]
 
