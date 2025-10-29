@@ -495,13 +495,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_microservicios_y_contenedores">7.1. Microservicios y contenedores</a></li>
 <li><a href="#_despliegue_de_aplicaciones_con_varios_archivos_docker_compose">7.2. Despliegue de aplicaciones con varios archivos Docker Compose</a></li>
-</ul>
-</li>
-<li><a href="#_docker_compose_db_yml">docker-compose-db.yml</a></li>
-<li><a href="#_docker_compose_app_yml">docker-compose-app.yml</a>
-<ul class="sectlevel2">
-<li><a href="#_el_ecosistema_docker">El ecosistema Docker</a></li>
-<li><a href="#_instalar_un_registro_de_imágenes_propio">Instalar un registro de imágenes propio</a></li>
+<li><a href="#_el_ecosistema_docker">7.3. El ecosistema Docker</a></li>
+<li><a href="#_instalar_un_registro_de_imágenes_propio">7.4. Instalar un registro de imágenes propio</a></li>
 </ul>
 </li>
 <li><a href="#_licencia">8. Licencia</a></li>
@@ -2668,50 +2663,37 @@ CMD ["python", "src/app.py"]</code></pre>
 <div class="paragraph">
 <p>Para ilustrar esto, supongamos que tenemos dos archivos <code>docker-compose.yml</code>: <code>docker-compose-db.yml</code> para los servicios comunes y <code>docker-compose-app.yml</code> para los servicios específicos de la aplicación. El siguiente fragmento ilustra la definición de una red común en ambos archivos.</p>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_docker_compose_db_yml">docker-compose-db.yml</h2>
-<div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre>services:
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">`docker-compose-db.yml`
+----
+services:
   db:
     image: mysql:latest
     networks:
       - common-network  <b class="conum">(1)</b>
 networks:
   common-network:
-    external: true <b class="conum">(2)</b></pre>
+    external: true <b class="conum">(2)</b>
+----</code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_docker_compose_app_yml">docker-compose-app.yml</h2>
-<div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre>services:
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">`docker-compose-app.yml`
+----
+services:
   app:
     image: myapp:latest
     networks:
       - common-network <b class="conum">(1)</b>
 networks:
   common-network:
-    external: true <b class="conum">(2)</b></pre>
+    external: true <b class="conum">(2)</b>
+----
+&lt;1&gt; Definición de la red común en los servicios
+&lt;2&gt; Indicación de que la red es externa y ya existe en el host</code></pre>
 </div>
-</div>
-<div class="colist arabic">
-<ol>
-<li>
-<p>Definición de la red común en los servicios</p>
-</li>
-<li>
-<p>Indicación de que la red es externa y ya existe en el host</p>
-</li>
-</ol>
 </div>
 <div class="paragraph">
 <p>Para desplegar la aplicación con ambos archivos <code>docker-compose.yml</code>, se usaría el siguiente comando:</p>
@@ -2721,8 +2703,9 @@ networks:
 <pre class="highlight"><code class="language-bash" data-lang="bash">$ docker compose -f docker-compose-db.yml -f docker-compose-app.yml up -d</code></pre>
 </div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_el_ecosistema_docker">El ecosistema Docker</h3>
+<h3 id="_el_ecosistema_docker">7.3. El ecosistema Docker</h3>
 <div class="imageblock">
 <div class="content">
 <img src="./images/DockerEcosystem.png" alt="DockerEcosystem" width="100%">
@@ -2730,7 +2713,7 @@ networks:
 </div>
 </div>
 <div class="sect2">
-<h3 id="_instalar_un_registro_de_imágenes_propio">Instalar un registro de imágenes propio</h3>
+<h3 id="_instalar_un_registro_de_imágenes_propio">7.4. Instalar un registro de imágenes propio</h3>
 <div class="paragraph">
 <p>Es posible tener un registro propio para imágenes por cuestiones de seguridad y confidencialidad. Veamos cómo crear un registro propio mediante contenedores. Se trata de un <a href="https://gist.github.com/ualmtorres/16d61858a92ea8cbd365f052052c4608">despliegue Docker Compose</a> que incluye un servicio para el registro (servidor) y otro para la interfaz web del registro. La interfaz web es opcional, pero es muy útil para ver las imágenes que tenemos en el registro y para subir imágenes al registro.</p>
 </div>
@@ -2887,7 +2870,7 @@ $ docker push localhost/hello-world <b class="conum">(3)</b></code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-29 18:17:33 +0100
+Last updated 2025-10-29 18:46:30 +0100
 </div>
 </div>
 </body>
