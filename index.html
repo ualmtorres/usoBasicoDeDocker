@@ -2663,37 +2663,45 @@ CMD ["python", "src/app.py"]</code></pre>
 <div class="paragraph">
 <p>Para ilustrar esto, supongamos que tenemos dos archivos <code>docker-compose.yml</code>: <code>docker-compose-db.yml</code> para los servicios comunes y <code>docker-compose-app.yml</code> para los servicios específicos de la aplicación. El siguiente fragmento ilustra la definición de una red común en ambos archivos.</p>
 </div>
+<div class="paragraph">
+<p><code>docker-compose-db.yml</code></p>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">`docker-compose-db.yml`
-----
-services:
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">services:
   db:
     image: mysql:latest
     networks:
       - common-network  <b class="conum">(1)</b>
 networks:
   common-network:
-    external: true <b class="conum">(2)</b>
-----</code></pre>
+    external: true <b class="conum">(2)</b></code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p><code>docker-compose-app.yml</code></p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">`docker-compose-app.yml`
-----
-services:
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">services:
   app:
     image: myapp:latest
     networks:
       - common-network <b class="conum">(1)</b>
 networks:
   common-network:
-    external: true <b class="conum">(2)</b>
-----
-&lt;1&gt; Definición de la red común en los servicios
-&lt;2&gt; Indicación de que la red es externa y ya existe en el host</code></pre>
+    external: true <b class="conum">(2)</b></code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>Definición de la red común en los servicios</p>
+</li>
+<li>
+<p>Indicación de que la red es externa y ya existe en el host</p>
+</li>
+</ol>
 </div>
 <div class="paragraph">
 <p>Para desplegar la aplicación con ambos archivos <code>docker-compose.yml</code>, se usaría el siguiente comando:</p>
@@ -2870,7 +2878,7 @@ $ docker push localhost/hello-world <b class="conum">(3)</b></code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-29 18:46:30 +0100
+Last updated 2025-10-29 18:54:38 +0100
 </div>
 </div>
 </body>

@@ -1246,8 +1246,8 @@ En ocasiones una aplicación puede estar formada por varios archivos `docker-com
 
 Para ilustrar esto, supongamos que tenemos dos archivos `docker-compose.yml`: `docker-compose-db.yml` para los servicios comunes y `docker-compose-app.yml` para los servicios específicos de la aplicación. El siguiente fragmento ilustra la definición de una red común en ambos archivos.
 
-[source,yaml]
 `docker-compose-db.yml`
+[source,yaml]
 ----
 services:
   db:
@@ -1259,8 +1259,8 @@ networks:
     external: true <2>
 ----
 
-[source,yaml]
 `docker-compose-app.yml`
+[source,yaml]
 ----
 services:
   app:
