@@ -1,6 +1,6 @@
 #/bin/bash
 
 cd calificaciones
-docker compose down
+docker compose -f docker-compose-images.yml down
 cd ..
 rm -rf calificaciones

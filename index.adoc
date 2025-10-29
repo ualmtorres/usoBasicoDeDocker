@@ -30,7 +30,7 @@ COLOCA A CONTINUACION EL RESUMEN
 ////
 Docker es un proyecto open source creado en 2013 y que ha supuesto una revolución para el desarrollo y despliegue de operaciones. Docker abstrae el hardware y el sistema operativo del host ejecutando las aplicaciones en contenedores, compartimentos aislados que contienen todos los recursos para una aplicación o servicio.
 
-En este seminario veremos cómo usar Docker para el desarrollo de aplicaciones sencillas, aprendiendo a crear servicios con _Docker Compose_ y conocer la técnica de desarrollo de aplicaciones multicontenedor con _Docker Compose_
+En este tutorial veremos cómo usar Docker para el desarrollo de aplicaciones sencillas, aprendiendo a crear servicios con _Docker Compose_ y conocer la técnica de desarrollo de aplicaciones multicontenedor con _Docker Compose_
 
 
 ////
@@ -51,8 +51,7 @@ Disponibles los repositorios usados en este seminario:
 * https://github.com/ualmtorres/usoBasicoDeDocker[Acceso a los ejemplos]
 * https://github.com/ualmtorres/docker_customer_catalog[Catálogo de clientes]
 * https://github.com/ualmtorres/webEstaticaBasica[Web estática básica]
-* https://github.com/ualmtorres/docker-compose-dev[Desarrollo con Docker Compose]
-* https://github.com/ualmtorres/docker-compose-build[Docker Compose con opción build]
+* https://github.com/ualmtorres/calificaciones[Calificaciones]
 ====
 
 // Entrar en modo numerado de apartados
@@ -115,7 +114,7 @@ Docker supone una revolución en los entornos de CI/CD. Tras la actualización d
 	
 ### Contenedores e imágenes
 
-* Un contenedor se lanza ejecutando una imagen.
+* Un contenedor se lanza a partir de una imagen.
 * Una imagen es una plantilla con las instrucciones de creación de un contenedor Docker:
     - Código
     - Runtime
@@ -137,6 +136,7 @@ Obtenemos:
 - Daemon de docker
 - Cliente de docker, que es el que ejecutamos en la consola
 - Docker compose
+- Docker desktop (interfaz gráfica)
 
 Tras esto, Docker Desktop se ejecutará en segundo plano y estará disponible para ejecutar comandos de Docker. Nos da una interfaz gráfica para ver los contenedores que tenemos en ejecución, las imágenes que tenemos, volúmenes para almacenamiento persistente, redes de interconexión entre contenedores, etc. Desde Docker Desktop y la consola podemos crear y eliminar contenedores, imágenes, volúmenes y redes. Desde la barra de herramientas de Docker podemos acceder a la configuración, al Learning Center y al entorno Docker de nuestro ordenador.
 
@@ -624,6 +624,12 @@ VOLUME /data <1>
 
 * Se construyen con `docker build` a partir de un `Dockerfile`
 * Se crean en un contexto (normalmente añadiendo archivos del directorio de trabajo del host a la imagen -p.e. el código fuente de la aplicación)
+
+[NOTE]
+====
+El contexto es el conjunto de archivos y carpetas que se envían al demonio de Docker para construir la imagen. Normalmente es el directorio donde se encuentra el `Dockerfile` y sus subdirectorios.
+====
+
 * Con `FROM` (normalmente primera instrucción del `Dockerfile`) inicializamos el sistema de archivos de la imagen (p.e. si es ubuntu obtenemos el sistema de archivos de Ubuntu)
 * Muchas imágenes disponibles en Docker Hub usan Alpine (una distribución ligera de Linux) en lugar de Ubuntu, Fedora o CentOS, debido a su menor tamaño
 * Cada instrucción del `Dockerfile` genera una nueva capa (con la diferencia) en ese sistema de archivos
@@ -775,7 +781,7 @@ Hasta ahora la imagen creada está en el repositorio local de imágenes. Para su
 docker push <user>/<image>:<tag>
 ```
 
-* Al hacer `push` las capas que ya estén subidas no se vuelven a subir. En cuanto una instrucción del `Dockerfile` cambia una capa, invalida al resto y se volcerán a crear las capas restantes. Por tanto, colocaremos antes en el `Dockerfile` lo que menos cambie.
+* Al hacer `push` las capas que ya estén subidas no se vuelven a subir. En cuanto una instrucción del `Dockerfile` cambia una capa, invalida al resto y se volverán a crear las capas restantes. Por tanto, colocaremos antes en el `Dockerfile` lo que menos cambie.
 * Al hacer `pull` sólo se descargan las capas nuevas.
 * Si cambiamos en el host archivos de los que se incluyen en la imagen se genera una capa nueva invalidando la caché.
 
@@ -798,7 +804,8 @@ $ docker image rm <image>: Elimina una imagen local
 ## Aplicaciones con varios contenedores
 
 * Docker Compose es una herramienta para definir y ejecutar aplicaciones Docker con varios contenedores.
-* De forma predeterminada, usaremos un archivo `docker-compose.yml` para configurar los _servicios_ de la aplicación. Los servicios son los componentes de la aplicación (p.e. un servicio para el almacenamiento de los datos y otro para el front-end)
+* De forma predeterminada, usaremos un archivo `docker-compose.yml` para configurar los _servicios_ de la aplicación. Los servicios son los componentes de la aplicación (p.e. un servicio para el almacenamiento de los datos y otro para el front-end).
+* De forma predeterminada, si no se crea ninguna red de interconexión entre los contenedores, Compose crea una red _bridge_ para que los contenedores puedan comunicarse entre sí. Estos contenedores pueden accederse entre sí por el nombre del servicio.
 * En un mismo host podemos tener varios entornos aislados. Compose usa nombres de proyecto para mantener a los entornos aislados. De forma predeterminada, Compose usa el nombre del directorio desde donde se lanza la aplicación.
 * `docker compose version` para obtener la versión y saber si está instalado.
 * Instalación desde https://docs.docker.com/compose/install[https://docs.docker.com/compose/install]
@@ -1045,103 +1052,136 @@ $ cd calificaciones
 
 ### Desarrollo de la API
 
-Se trata de una API en PHP con Phalcon. La API contiene los datos directamente en JSON para no añadir otro componente de bases de datos al ejemplo, conseguir un ejemplo más sencillo y no perdernos en los detalles. El objetivo es ver cómo desarrollar con Docker Compose.
+Se trata de una API en Python con FastAPI. Por sencillez, la API contiene los datos directamente en JSON para no añadir otro componente de bases de datos al ejemplo. Así conseguiremos un ejemplo más sencillo y no nos perderemos en los detalles. El objetivo es ver cómo desarrollar con Docker Compose.
 
-1. Desde el directorio del proyecto crear una carpeta `api` para la API.
-1. Crear un archivo https://gist.githubusercontent.com/ualmtorres/581e7f6f15cda4d9c7e2b04c4fca3486/raw/75624e5ae0275c52d3246812bf8eda87ba5bb188/.htaccess[`.htaccess`] que es necesario para rescribir las rutas en las peticiones a la API
-1. Crear un archivo https://gist.githubusercontent.com/ualmtorres/068ce3477fbee09276a69e37b8cc664d/raw/1a4e2ce4688a93c67dcb095c52e7453253833bcb/selectividad-api-index.php[`index.php`] con el código de la API.
-1. Crear el https://gist.githubusercontent.com/ualmtorres/efebdfef3bb159ffd55f3a4321fef443/raw/46dc719ee4c0ac7a8ec06857be8452258f3f6647/Dockerfile-Phalcon[`Dockerfile`] con las instrucciones para crear la imagen de la API
+1. Desde el directorio del proyecto crear una carpeta `api` para la API y una `routes` para las rutas de la API.
+1. En la carpeta `api` crear el archivo https://github.com/ualmtorres/calificaciones/blob/master/api/requirements.txt[`requirements.txt`] con las dependencias de la API.
+1. En carpeta `api/routes` crear los archivos:
+  * https://github.com/ualmtorres/calificaciones/blob/master/api/routes/test.py[`test.py`] con una ruta de prueba.
+  * https://github.com/ualmtorres/calificaciones/blob/master/api/routes/calificaciones.py[`calificaciones.py`] con la ruta de la API para obtener las calificaciones. Este código incluye los datos en JSON y dos endpoints: uno para obtener todas las calificaciones y otro para obtener la calificación de un estudiante concreto por su id.
+1. En la carpeta `api` crear el archivo https://github.com/ualmtorres/calificaciones/blob/master/api/main.py[`main.py`] con el código principal de la API que arranca el servidor y define las rutas.
+1. En la carpeta `api` crear el https://github.com/ualmtorres/calificaciones/blob/master/api/Dockerfile[`Dockerfile`] con las instrucciones para crear la imagen de la API
 
 +
 [source,dockerfile]
 ----
-FROM ualmtorres/phalcon-apache-ubuntu <1>
+FROM python:3.9-slim <1>
 
-ADD . /var/www/html <2>
+WORKDIR /app <2>
 
-VOLUME /var/www/html <3>
+COPY ./requirements.txt /tmp/requirements.txt <3>
 
-EXPOSE 80 <4>
+RUN pip install -r /tmp/requirements.txt <4>
+
+COPY ../ ./ <5>
+
+EXPOSE 8000 <6>
+
+CMD [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload" ] <7>
 ----
-<1> Imagen de base para la ejecución de la API. Incluye Apache, PHP y el framework Phalcon
-<2> Incluir el código de la API en la carpeta de publicación de Apache
-<3> Crear un punto de montaje para que se pueda tener la base de código fuera del contenedor
-<4> Indicar el puerto por el que escucha el contenedor (80 por ser Apache)
+<1> Imagen de base para la ejecución de la API.
+<2> Definir el directorio de trabajo dentro del contenedor
+<3> Copiar el archivo de dependencias al contenedor
+<4> Instalar las dependencias de la API
+<5> Incluir el código de la API en el contenedor. Como el `Dockerfile` está en la carpeta `api`, para copiar todo el código de la API hay que subir un nivel (`../`) y copiar todo (`./`)
+<6> Indicar el puerto por el que escucha la API (8000 por ser FastAPI)
+<7> Comando para arrancar la API con Uvicorn (servidor ASGI para Python)
 
-1. Crear en el directorio de la aplicación (un nivel por encima de `api`) el archivo https://gist.githubusercontent.com/ualmtorres/dc5c2ad42f3bf5d3f625f9234c871cbf/raw/78c935771f75bafaff3ff183251b7ccf1150bf0e/docker-compose-solo-api.yml[`docker-compose.yml`] para poder ejecutar la API. El archivo `docker-compose.yml` lo creamos un directorio por encima de `api` porque la especificación del volumen del código de la API en el archivo `docker-compose.yml` se hace un nivel por encima del directorio `api`
+1. En la carpeta de la aplicación (un nivel por encima de `api`) crear el archivo https://gist.github.com/ualmtorres/15f3ea9bc15bc8d12200c53ccfb8dd19[`docker-compose.yml`] para poder ejecutar la API. El archivo `docker-compose.yml` lo creamos un directorio por encima de `api` porque la especificación del volumen del código de la API en el archivo `docker-compose.yml` se hace un nivel por encima del directorio `api`
 
 +
 [source,yaml]
 ----
-version: '2'
 services:
   calificaciones-api:
     container_name: calificaciones-api
-    restart: always
-    image: ualmtorres/phalcon-apache-ubuntu <1>
-    ports:
-      - "80:80"
+    build:
+      context: ./api <1>
+      dockerfile: Dockerfile <2>
     volumes:
-      - ./api:/var/www/html <2>
+      - "./api:/app" <3>
+    ports:
+      - "8000:8000"
 ----
-<1> Imagen base para ejecutar la API
-<2> Volumen en el host montado en el directorio `/var/www/html` del contenedor
+<1> Carpeta donde se encuentra el `Dockerfile` para crear la imagen de la API
+<2> Nombre del `Dockerfile` para crear la imagen de la API. Esto es opcional si el archivo se llama `Dockerfile`
+<3> Volumen en el host montado en el directorio `/app` del contenedor
 
-Si desplegamos el `docker-compose.yml` veremos la API ejecutándose en el puerto 80 (`http://localhost/calification`)
+Si desplegamos el `docker-compose.yml` veremos la API ejecutándose en el puerto 8000 (`http://localhost:8000/calificacion`)
 
 image::calificaciones-api.png[]
 
 ### Desarrollo del front
 
-1. Desde el directorio del proyecto crear una carpeta `front` para el código del front.
-1. Crear un archivo https://gist.github.com/ualmtorres/52811ce82117ca10bf2d58f53d54ccf4[`index.php`] con el código del front.
-1. Crear el https://gist.github.com/ualmtorres/eeb473aec54e307d5bd73f49e72b5ec4[`Dockerfile`] con las instrucciones para crear la imagen del front
+El frontend lo desarrollaremos con Flask. Será un front muy sencillo que consuma la API desarrollada anteriormente y muestre los datos en una tabla HTML.
+
+1. Desde el directorio del proyecto crear una carpeta `frontend` para el código del frontend.
+1. En la carpeta `frontend` crear el archivo https://github.com/ualmtorres/calificaciones/blob/master/frontend/requirements.txt[`requirements.txt`] con las dependencias del frontend.
+1. Crear una carpeta `src`. Dentro de ella:
+  * Crear una carpeta `templates` para las plantillas HTML.
+  * Crear una carpeta `static` para los archivos estáticos (CSS, JS, imágenes, etc.)
+1. En la carpeta `src/templates` crear el archivo https://github.com/ualmtorres/calificaciones/blob/master/frontend/src/templates/index.html[`index.html`] con la plantilla HTML para mostrar las calificaciones.
+1. En la carpeta `src` crear el archivo https://github.com/ualmtorres/calificaciones/blob/master/frontend/src/app.py[`app.py`] con el código principal del front que arranca el servidor Flask y define la ruta principal que consume la API y renderiza la plantilla HTML.
+1. Crear el https://github.com/ualmtorres/calificaciones/blob/master/frontend/Dockerfile[`Dockerfile`] con las instrucciones para crear la imagen del frontend
 
 +
 [source,dockerfile]
 ----
-FROM php:7.2-apache <1>
+# Dockerfile para el proyecto calificaciones-frontend
 
-ADD . /var/www/html <2>
+# Usar una imagen base de Python
+FROM python:3.9-slim
 
-VOLUME /var/www/html <3>
+# Establecer el directorio de trabajo
+WORKDIR /app
 
-EXPOSE 80
+# Copiar el archivo de requisitos y la aplicación al contenedor
+COPY requirements.txt requirements.txt
+COPY src/ ./src/
+
+# Instalar las dependencias
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Exponer el puerto en el que la aplicación se ejecutará
+EXPOSE 5000
+
+# Comando para ejecutar la aplicación
+CMD ["python", "src/app.py"]
 ----
-<1> Imagen de base para la ejecución del front. Incluye Apache y PHP
-<2> Incluir el código del front en la carpeta de publicación de Apache
-<3> Crear un punto de montaje para que se pueda tener la base de código fuera del contenedor
-<4> Indicar el puerto por el que escucha el contenedor (80 por ser Apache)
 
 Modificar el archivo `docker-compose.yml` (un nivel por encima de `front`)  añadiéndole el servicio para poder ejecutar el front.
 
 [source,yaml]
 ----
-version: '2'
 services:
   calificaciones-api:
     container_name: calificaciones-api
-    restart: always
-    image: ualmtorres/phalcon-apache-ubuntu
-    ports:
-      - "80:80"
+    build:
+      context: ./api
+      dockerfile: Dockerfile
     volumes:
-      - ./api:/var/www/html
-  calificaciones-front: <1>
-    container_name: calificaciones-front
-    restart: always
-    image: php:7.2-apache <2>
+      - "./api:/app"
     ports:
-      - "8088:80" <3>
-    volumes:
-      - ./front:/var/www/html <4>
-----
-<1> Servicio para el front
-<2> Imagen base para ejecutar el front
-<3> Mapping de puertos para el front (El 80 está ocupado con la API)
-<4> Volumen en el host montado en el directorio `/var/www/html` del contenedor
+      - "8000:8000"
 
-Si volvemos a desplegar el `docker-compose.yml` con `docker compose up -d`, se mantiene intacto lo ya desplegado y se despliegan las modificaciones. El front se verá ejecutándose en el puerto 8088
+  calificaciones-frontend: <1
+      container_name: calificaciones-frontend
+      build:
+        context: ./frontend <2>
+        dockerfile: Dockerfile
+      volumes:
+        - "./frontend:/app" <3>
+      ports:
+        - "80:5000" <4>
+      depends_on:
+        - calificaciones-api
+----
+<1> Servicio para el frontend
+<2> Carpeta donde se encuentra el `Dockerfile` para crear la imagen del frontend. El nombre del `Dockerfile` es opcional si se llama `Dockerfile`
+<3> Volumen en el host montado en el directorio `/app` del contenedor
+<4> Mapping de puertos para el frontend. La API se sirve en el puerto 8000 del host y el frontend en el puerto 80 del host
+
+Si volvemos a desplegar el `docker-compose.yml` con `docker compose up -d`, se mantiene intacto lo ya desplegado y se despliegan las modificaciones. El frontend se verá ejecutándose en el puerto 80 (`http://localhost`)
 
 image::calificaciones-front.png[]
 
@@ -1149,238 +1189,39 @@ image::calificaciones-front.png[]
 
 Una vez desarrollados los servicios de la aplicación podríamos proceder a la construcción de sus imágenes. Se trataría de un proceso manual en el que ejecutaríamos el comando `docker build` en cada una de los directorios de los servicios desarrollados
 
-* En el directorio de la API: `docker build -t ualmtorres/calificaciones-api:v0 .`
-* En el directorio del front: `docker build -t ualmtorres/calificaciones-front:v0 .`
+* En el directorio de la API: `docker build -t ualmtorres/calificaciones-api:v0.1 .`
+* En el directorio del frontend: `docker build -t ualmtorres/calificaciones-frontend:v0.1 .`
 
 ### Prueba de la aplicación
 
-Si ahora quisiéramos desplegar la aplicación con Docker Compose nos encontramos con el problema que el archivo `docker-compose.yml` usa como imagen base las imágenes base creadas para el proceso de desarrollo. Sin embargo, ahora queremos desplegar la aplicación usando las imágenes creadas para la API y el front. Este problema lo podemos solventar rápidamente creando otro archivo para Docker Compose (p.e. https://gist.github.com/ualmtorres/80068c863b2dbe31d578ffed6897219f[`docker-compose-produccion.yml`]) y lanzar Docker Compose con ese archivo. `docker-compose-produccion.yml` incluiría las imágenes creadas montando igualmente los directorios de las bases de código de la API y del front.
+Si ahora quisiéramos desplegar la aplicación con Docker Compose nos encontramos con el problema que el archivo `docker-compose.yml` usa como imagen base las imágenes base creadas para el proceso de desarrollo. Sin embargo, ahora queremos desplegar la aplicación usando las imágenes creadas para la API y el frontend. Este problema lo podemos solventar rápidamente creando otro archivo para Docker Compose (p.e. https://github.com/ualmtorres/calificaciones/blob/master/docker-compose-images.yml[`docker-compose-images.yml`]) y lanzar Docker Compose con ese archivo. `docker-compose-images.yml` ya incorpora el código de la API y del frontend en sus respectivas imágenes. Esta sería la forma en la que normalmente se desplegaría la aplicación en un entorno de producción. Así, es preferible tener dos archivos `docker-compose.yml`: uno para el desarrollo y otro para el despliegue en producción. 
+
+[NOTE]
+====
+Es una prática habitual que el archivo de producción de Docker compose no contega el código de la aplicación montado como volumen. Esto evita que se puedan hacer cambios en el código de la aplicación en producción. No obstante, lo que sí es habitual es montar volúmenes para los datos que necesite la aplicación (p.e. bases de datos, ficheros de configuración, etc.)
+====
 
 [source,yml]
 ----
-version: '2'
 services:
   calificaciones-api:
     container_name: calificaciones-api
-    restart: always
-    image: ualmtorres/calificaciones-api:v0 <1>
+    image: ualmtorres/calificaciones-api:0.1 <1>
     ports:
-      - "80:80"
-    volumes:
-      - ./api:/var/www/html
-  calificaciones-front:
-    container_name: calificaciones-front
-    restart: always
-    image: ualmtorres/calificaciones-front:v0 <2>
-    ports:
-      - "8088:80"
-    volumes:
-      - ./front:/var/www/html
+      - "8000:8000"
+
+  calificaciones-frontend:
+      container_name: calificaciones-frontend
+      image: ualmtorres/calificaciones-frontend:0.1 <2>
+      ports:
+        - "80:5000"
+      depends_on:
+        - calificaciones-api
 ----
 <1> Imagen de la API como base 
 <2> Imagen del front como base
 
-### Docker Compose con la opción `build`
-
-El tener varios archivos para Docker Compose puede resultar confuso y en algunas ocasiones nos puede llevar a errores pensando que hemos usado uno cuando realmente estábamos usando el otro. Además, la creación de imágenes en un despliegue con gran cantidad de servicios implica la construcción manual de cada una de sus imágenes.
-
-Para evitar esta situación podemos usar la opción `build`. La opción `build` crea las imágenes a partir de los archivos `Dockerfile` que indiquemos y posteriormente crea el contenedor a partir de esa imagen. Para hacer esto, incluiremos dos particularidades en el archivo `docker-compose.yml` con respecto a los que hemos estado usando hasta ahora:
-
-* Incluir una opción `build` que indica el contexto donde encontrar el `Dockerfile` para crear la imagen del servicio.
-* El nombre de la imagen ahora no es el nombre de la imagen de base para crear el servicio, sino el nombre que se dará a la imagen construida para desplegar el servicio.
-
-.Archivo https://gist.github.com/ualmtorres/2734a52dfc6e1ea4f35bf3bc52d9c57e[`docker-compose.yml`] para la construcción de imágenes
-====
-[source,yaml]
-----
-version: '2'
-services:
-  calificaciones-api:
-    build: <1>
-      context: ./api <2>
-    container_name: calificaciones-api
-    restart: always
-    image: ualmtorres/calificaciones-api:v0 <3>
-    ports:
-      - "80:80"
-    volumes:
-      - ./api:/var/www/html
-
-  calificaciones-front:
-    build: <4>
-      context: ./front <5>
-    container_name: calificaciones-front
-    restart: always
-    image: ualmtorres/calificaciones-front:v0 <6>
-    ports:
-      - "8088:80"
-    volumes:
-      - ./front:/var/www/html
-----
-<1> Opción `build` para construir la imagen
-<2> Ruta del `Dockerfile` de la API
-<3> Nombre para la imagen de la API
-<4> Opción `build` para construir la imagen
-<5> Ruta del `Dockerfile` del front
-<6> Nombre para la imagen del front
-====
-
-Para comprobar el funcionamiento de este nuevo procedimiento, eliminaremos todo rastro de lo anterior echando abajo el despliegue anterior y borrando las imágenes creadas anteriormente.
-
-[source,bash]
-----
-$ docker compose down
-$ docker image rm ualmtorres/calificaciones-api:v0
-$ docker image rm ualmtorres/calificaciones-front:v0
-----
-
-A continuación, basta con volver a levantar el entorno com `docker compose up -d` y veremos como se construyen las imágenes para el despliegue de los contenedores y los servicios de Docker Compose funcionan correctamte.
-
-image::calificaciones-front.png[]
-
-Cuando introduzcamos cambios en la base de código y queramos volver a desplegarlos sobre las imágenes podremos ejecutar cualquiera de estos dos comandos:
-
-[source,bash]
-----
-$ docker-compose build
-$ docker compose up --build
-----
-
-
-
 ## Otras cosas interesantes
-
-### Configuración de imágenes de base
-
-Aquí se muestra cómo configurar una imagen con Ubuntu 20.04, PHP y el framework Phalcon. También se muestran los dos archivos auxiliares necesarios para la configuración de Apache que necesita Phalcon.
-
-.Dockerfile
-====
-[source,dockerfile]
-----
-FROM ubuntu:20.04
-
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && apt-get install -yq --no-install-recommends \
-    apt-utils \
-    curl \
-    # Install git
-    git \
-    # Install apache
-    apache2 \
-    # Install last version of PHP
-    php \
-    libapache2-mod-php \
-    php-mcrypt \
-    php-mysql \
-    php-curl \
-    nano \
-    ca-certificates \
-    locales \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN curl -s "https://packagecloud.io/install/repositories/phalcon/stable/script.deb.sh" | /bin/bash
-
-RUN apt-get install -y php7.0-phalcon
-
-# Set locales
-RUN locale-gen en_US.UTF-8 en_GB.UTF-8 es_ES.UTF-8 
-
-COPY conf/apache2.conf /etc/apache2/apache2.conf
-COPY conf/dir.conf /etc/apache2/mods-available/dir.conf
-
-RUN a2enmod rewrite
-RUN a2enmod headers
-RUN service apache2 restart
-
-EXPOSE 80 443
-
-WORKDIR /var/www/html
-
-RUN rm /var/www/html/index.html
-
-HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD curl -f http://localhost || exit 1
-
-CMD apachectl -D FOREGROUND 
-----
-====
-
-.Archivo `conf/apache2.conf`
-====
-[source,apache]
-----
-Mutex file:${APACHE_LOCK_DIR} default
-
-PidFile ${APACHE_PID_FILE}
-
-Timeout 300
-
-KeepAlive On
-
-MaxKeepAliveRequests 100
-
-KeepAliveTimeout 5
-
-User ${APACHE_RUN_USER}
-Group ${APACHE_RUN_GROUP}
-
-HostnameLookups Off
-
-ErrorLog ${APACHE_LOG_DIR}/error.log
-
-LogLevel warn
-
-IncludeOptional mods-enabled/*.load
-IncludeOptional mods-enabled/*.conf
-
-Include ports.conf
-
-<Directory />
-	Options FollowSymLinks
-	AllowOverride None
-	Require all denied
-</Directory>
-
-<Directory /usr/share>
-	AllowOverride None
-	Require all granted
-</Directory>
-
-<Directory /var/www/>
-	Options Indexes FollowSymLinks
-	AllowOverride All
-	Require all granted
-	Header set Access-Control-Allow-Origin "*"
-</Directory>
-
-AccessFileName .htaccess
-
-<FilesMatch "^\.ht">
-	Require all denied
-</FilesMatch>
-
-LogFormat "%v:%p %h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" vhost_combined
-LogFormat "%h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" combined
-LogFormat "%h %l %u %t \"%r\" %>s %O" common
-LogFormat "%{Referer}i -> %U" referer
-LogFormat "%{User-agent}i" agent
-
-IncludeOptional conf-enabled/*.conf
-
-IncludeOptional sites-enabled/*.conf
-----
-====
-
-.Archivo `conf/dir.conf`
-====
-[source,apache]
-----
-<IfModule mod_dir.c>
-	DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
-</IfModule>
-----
-====
 
 ### Microservicios y contenedores
 
@@ -1399,6 +1240,47 @@ Con microservicios:
 
 image::./KeepCalmAndUseDocker.png[width=100%]
 
+### Despliegue de aplicaciones con varios archivos Docker Compose
+
+En ocasiones una aplicación puede estar formada por varios archivos `docker-compose.yml`. Por ejemplo, un archivo para los servicios comunes (base de datos, caché, colas de mensajes, etc.) y otro archivo para los servicios específicos de la aplicación (frontend, backend, etc.). En estos casos, podemos usar la opción `-f` de Docker Compose para especificar varios archivos `docker-compose.yml`. Docker Compose combinará los archivos especificados y desplegará la aplicación. Sin embargo, hay que tener en cuenta que si no se especifica ninguna red, Docker Compose creará una red para cada archivo `docker-compose.yml`. Por tanto, si los servicios de los distintos archivos tienen que comunicarse entre sí, es necesario definir una red común en los distintos archivos. Si no se define ninguna red, los servicios de los distintos archivos no podrán comunicarse entre sí porque estarían en redes distintas. Para definir una red común, se puede usar la opción `external` en la definición de la red de los archivos `docker-compose.yml`.
+
+Para ilustrar esto, supongamos que tenemos dos archivos `docker-compose.yml`: `docker-compose-db.yml` para los servicios comunes y `docker-compose-app.yml` para los servicios específicos de la aplicación. El siguiente fragmento ilustra la definición de una red común en ambos archivos.
+
+[source,yaml]
+# docker-compose-db.yml
+----
+services:
+  db:
+    image: mysql:latest
+    networks:
+      - common-network  <1>
+networks:
+  common-network: 
+    external: true <2>
+----
+
+[source,yaml]
+# docker-compose-app.yml
+----
+services:
+  app:
+    image: myapp:latest
+    networks:
+      - common-network <1>
+networks:
+  common-network: 
+    external: true <2>
+----
+<1> Definición de la red común en los servicios
+<2> Indicación de que la red es externa y ya existe en el host
+
+Para desplegar la aplicación con ambos archivos `docker-compose.yml`, se usaría el siguiente comando:
+
+[source,bash]
+----
+$ docker compose -f docker-compose-db.yml -f docker-compose-app.yml up -d
+----
+
 ### El ecosistema Docker 
 
 image::./DockerEcosystem.png[width=100%]
@@ -1409,8 +1291,6 @@ Es posible tener un registro propio para imágenes por cuestiones de seguridad y
 
 [source, yaml]
 ----
-version: "3.8"
-
 services:
   registry-ui: <1>
     image: joxit/docker-registry-ui:main
