@@ -1384,6 +1384,11 @@ $ docker tag <image> <server>/<project>/<image>[:<version>]
 $ docker push <server>/<project>/<image>[:<version>]
 ----
 
+### Software adicional para trabajar con Docker
+
+* https://www.portainer.io/[Portainer]: Interfaz web para gestionar contenedores Docker
+* https://github.com/selfhosters-cc/container-census[Container Census]: Herramienta de gestión de contenedores Docker. Permite tener una visión global de los contenedores desplegados en distintos hosts Docker y funciones interesantes de análisis de vulnerabilidades, actualizaciones, etc.
+
 ## Licencia
 
 Licencia CC BY-NC-ND 4.0
